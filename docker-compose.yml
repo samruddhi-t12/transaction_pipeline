@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # 1. The PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: transaction_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DOCKER_DB_PASSWORD}
+      POSTGRES_DB: transaction_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # 2. The Redis Message Broker
+  redis:
+    image: redis:alpine
+    container_name: transaction_redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  # 3. The FastAPI Web Server
+  api:
+    build: .
+    container_name: transaction_api
+    restart: always
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      DATABASE_URL: "postgresql://postgres:${DOCKER_DB_PASSWORD}@db:5432/transaction_db"
+      REDIS_URL: "redis://redis:6379/0"
+      GEMINI_API_KEY: "${GEMINI_API_KEY}"
+    # ADDED: Connect the shared folder here
+    volumes:
+      - shared_uploads:/app/app/uploads
+
+  # 4. The Celery Background Worker
+  worker:
+    build: .
+    container_name: transaction_worker
+    restart: always
+    command: celery -A app.worker.celery_app worker --loglevel=info
+    depends_on:
+      - db
+      - redis
+    environment:
+      DATABASE_URL: "postgresql://postgres:${DOCKER_DB_PASSWORD}@db:5432/transaction_db"
+      REDIS_URL: "redis://redis:6379/0"
+      GEMINI_API_KEY: "${GEMINI_API_KEY}"
+    # ADDED: Connect the EXACT SAME shared folder here
+    volumes:
+      - shared_uploads:/app/app/uploads
+
+# Declare the volumes at the bottom
+volumes:
+  postgres_data:
+  shared_uploads: # ADDED THIS LINE

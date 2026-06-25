@@ -1,0 +1,25 @@
+# Environments
+.env
+venv/
+env/
+.venv/
+
+# Python built-ins
+__pycache__/
+*.py[cod]
+*$py.class
+
+# User Uploads & Data
+app/uploads/
+*.csv
+
+# Docker
+.dockerignore
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
