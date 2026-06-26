@@ -2,20 +2,18 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from app.core.config import settings
 
-# 1. Create the Engine
+# establishes connection pool
 engine = create_engine(settings.DATABASE_URL)
 
-# 2. Create the Session Factory
-# Note the lowercase 'autoflush' here
+# create the Session Factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# 3. Create the Base Class
+# create the Base Class
 Base = declarative_base()
 
-# 4. Dependency Injection
 def get_db():
-    db = SessionLocal()
+    db = SessionLocal()#creates new session
     try:
-        yield db
+        yield db #hands seesion obj to api route and suspends function
     finally:
-        db.close()
+        db.close()#close connection even it crashes

@@ -21,7 +21,7 @@ class Job(Base):
         CheckConstraint("status IN ('pending', 'processing', 'completed', 'failed')", name="check_job_status"),
     )
 
-    # Relationships
+    # relationships
     transactions = relationship("Transaction", back_populates="job", cascade="all, delete-orphan")
     summary = relationship("JobSummary", back_populates="job", uselist=False, cascade="all, delete-orphan")
 
@@ -49,7 +49,7 @@ class Transaction(Base):
         CheckConstraint("status IN ('SUCCESS', 'FAILED', 'PENDING')", name="check_txn_status"),
     )
 
-    # Relationships
+    # relationships
     job = relationship("Job", back_populates="transactions")
 
 class JobSummary(Base):
@@ -68,5 +68,5 @@ class JobSummary(Base):
         CheckConstraint("risk_level IN ('low', 'medium', 'high')", name="check_risk_level"),
     )
 
-    # Relationships
+    # relationships
     job = relationship("Job", back_populates="summary")
