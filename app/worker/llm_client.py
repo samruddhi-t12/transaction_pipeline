@@ -4,7 +4,7 @@ import httpx
 from app.core.config import settings
 
 def call_gemini_with_retry(prompt: str, max_retries: int = 3):
-    """Calls Gemini 1.5 Flash with exponential backoff and forces JSON output."""
+    """Calls Gemini 2.5 Flash with exponential backoff and forces JSON output."""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={settings.GEMINI_API_KEY}"
     
     payload = {
@@ -26,7 +26,7 @@ def call_gemini_with_retry(prompt: str, max_retries: int = 3):
         except Exception as e:
             print(f"LLM Call Failed (Attempt {attempt + 1}/{max_retries}): {e}")
             if attempt == max_retries - 1:
-                return None # If we fail 3 times, return None so the pipeline doesn't crash
+                return None # if we fail 3 times return None so pipeline doesn't crash
             
             # EXPONENTIAL BACKOFF: Sleep for 2 seconds, then 4 seconds...
             time.sleep(2 ** (attempt + 1))

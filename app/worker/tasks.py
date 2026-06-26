@@ -30,7 +30,7 @@ def process_csv_task(self, job_id: str, file_path: str):
         job.status = "processing"
         db.commit()
 
-        # --- 1. DATA CLEANING & ANOMALY MATH (From Phase 4) ---
+        # DATA CLEANING & ANOMALY MATH
         raw_rows = []
         with open(file_path, mode='r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
@@ -87,7 +87,7 @@ def process_csv_task(self, job_id: str, file_path: str):
                 txn.anomaly_reason = " | ".join(reasons)
                 anomaly_count += 1
 
-        # --- 2. BATCH LLM CATEGORIZATION ---
+        # BATCH LLM CATEGORIZATION
         llm_category_map = {}
         if uncategorized_merchants:
             prompt = f"Categorize these merchants into EXACTLY one of: Food, Shopping, Travel, Transport, Utilities, Cash Withdrawal, Entertainment, Other. Return ONLY a valid JSON object mapping the merchant name to the category. Merchants: {list(uncategorized_merchants)}"
